@@ -1,0 +1,86 @@
+﻿@model ProyectoSistemaInteligente.Models.DatosArchivo
+
+
+@{
+    ViewData["Title"] = "Archivo cargado";
+}
+
+
+    <h2>Archivo cargado correctamente</h2>
+
+    <hr />
+
+
+        <div class="alert alert-success">
+
+            El archivo fue guardado correctamente.
+
+                </div>
+        <h4>Vista previa de datos</h4>
+
+        <table class="table table-bordered">
+
+            @foreach (var fila in Model.Datos.Take(6))
+            {
+                <tr>
+
+                    @foreach (var valor in fila)
+                    {
+                        <td>
+                            @valor
+                        </td>
+                    }
+
+                </tr>
+            }
+
+        </table>
+        <h4>Tipos detectados</h4>
+
+        <table class="table table-bordered">
+
+            <tr>
+
+                <th>
+                    Columna
+                </th>
+
+                <th>
+                    Tipo
+                </th>
+
+                <th>
+                    Valores vacíos
+                </th>
+
+            </tr>
+
+
+            @foreach (var columna in Model.Columnas)
+            {
+                <tr>
+
+                    <td>
+                        @columna.Nombre
+                    </td>
+
+                    <td>
+                        @columna.TipoDato
+                    </td>
+
+                    <td>
+                        @columna.ValoresNulos
+                    </td>
+
+                </tr>
+            }
+
+        </table>
+
+        <a asp-controller="Analisis"
+           asp-action="Results"
+           class="btn btn-success">
+
+            Resultados
+
+        </a>

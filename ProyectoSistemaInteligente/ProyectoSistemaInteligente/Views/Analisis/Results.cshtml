@@ -1,0 +1,215 @@
+﻿@model ProyectoSistemaInteligente.Models.DatosArchivo
+
+    @{
+        ViewData["Title"] = "Resultados";
+    }
+
+
+    <h2>Resultados del análisis</h2>
+
+    <hr />
+
+
+    <h4>Estadísticas descriptivas</h4>
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Columna
+                    </th>
+
+                    <th>
+                        Cantidad
+                    </th>
+
+                    <th>
+                        Promedio
+                    </th>
+
+                    <th>
+                        Mediana
+                    </th>
+
+                    <th>
+                        Mínimo
+                    </th>
+
+                    <th>
+                        Máximo
+                    </th>
+
+                    <th>
+                        Desviación estándar
+                    </th>
+
+                </tr>
+            </thead>
+        <tbody>
+
+            @foreach (var item in Model.Estadisticas)
+            {
+                <tr>
+
+                    <td>
+                        @item.NombreColumna
+                    </td>
+
+                    <td>
+                        @item.Cantidad
+                    </td>
+
+                    <td>
+                        @item.Promedio.ToString("0.00")
+                    </td>
+
+                    <td>
+                        @item.Mediana.ToString("0.00")
+                    </td>
+
+                    <td>
+                        @item.Minimo.ToString("0.00")
+                    </td>
+
+                    <td>
+                        @item.Maximo.ToString("0.00")
+                    </td>
+
+                    <td>
+                        @item.DesviacionEstandar.ToString("0.00")
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+    <hr />
+
+
+    <h4>Correlaciones encontradas</h4>
+
+
+    <table class="table table-bordered table-striped">
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Variable 1
+                </th>
+
+                <th>
+                    Variable 2
+                </th>
+
+                <th>
+                    Coeficiente
+                </th>
+
+                <th>
+                    Interpretación
+                </th>
+
+            </tr>
+        </thead>
+     <tbody>
+
+            @foreach (var item in Model.Correlaciones)
+            {
+                <tr>
+
+                    <td>
+                        @item.Columna1
+                    </td>
+
+                    <td>
+                        @item.Columna2
+                    </td>
+
+                    <td>
+                        @item.Coeficiente.ToString("0.000")
+                    </td>
+
+                    <td>
+                        @item.Interpretacion
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+    </table>
+
+
+    <hr />
+
+
+    <h4>Valores atípicos detectados</h4>
+
+
+    @if (Model.ValoresAtipicos.Count == 0)
+    {
+        <div class="alert alert-success">
+
+            No se encontraron valores atípicos.
+
+        </div>
+    }
+    else
+    {
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Columna
+                    </th>
+
+                    <th>
+                        Fila
+                    </th>
+
+                    <th>
+                        Valor
+                    </th>
+
+                    <th>
+                        Método
+                    </th>
+
+                </tr>
+            </thead>
+          <tbody>
+
+                @foreach (var item in Model.ValoresAtipicos)
+                {
+                    <tr>
+                        <td>
+                            @item.Columna
+                        </td>
+
+                        <td>
+                            @item.Fila
+                        </td>
+
+                        <td>
+                            @item.Valor
+                        </td>
+
+                        <td>
+                            @item.Metodo
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    }
