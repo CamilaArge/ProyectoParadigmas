@@ -18,9 +18,7 @@ namespace ProyectoSistemaInteligente.Services
 
             CalcularValoresAtipicos(archivo);
 
-            //Falta:
-            //EjecutarClustering(archivo);
-            //GenerarResumen(archivo);
+            CalcularClustering(archivo);
         }
 
 
@@ -31,13 +29,13 @@ namespace ProyectoSistemaInteligente.Services
 
             for (int i = 0; i < archivo.Columnas.Count; i++)
             {
-                if (!archivo.Columnas[i].EsNumerica)
-                    continue;
+                string nombre = archivo.Columnas[i].Nombre;
 
+                if (!archivo.DatosNumericos.ContainsKey(nombre))
+                    continue;
 
                 List<double> valores =
                     archivo.DatosNumericos[archivo.Columnas[i].Nombre];
-
 
                 Estadisticas estadistica = new Estadisticas
                 {
@@ -62,46 +60,71 @@ namespace ProyectoSistemaInteligente.Services
 
         }
 
-
-        //calcula la correlacion de Pearson entre todas las colunmas de numeros.
+        // calcula la correlacion de Pearson entre todas las columnas numericas
         private void CalcularCorrelaciones(DatosArchivo archivo)
         {
             archivo.Correlaciones.Clear();
 
-
             for (int i = 0; i < archivo.Columnas.Count; i++)
             {
-                if (!archivo.Columnas[i].EsNumerica)
+                string columna1 = archivo.Columnas[i].Nombre;
+
+                if (!archivo.DatosNumericos.ContainsKey(columna1))
                     continue;
 
 
                 for (int j = i + 1; j < archivo.Columnas.Count; j++)
                 {
-                    if (!archivo.Columnas[j].EsNumerica)
+                    string columna2 = archivo.Columnas[j].Nombre;
+
+                    if (!archivo.DatosNumericos.ContainsKey(columna2))
                         continue;
 
 
-                    double[] datos1 =
-                        archivo.DatosNumericos[
-                            archivo.Columnas[i].Nombre]
-                        .ToArray();
+                    List<double> valores1 = new();
+                    List<double> valores2 = new();
 
 
-                    double[] datos2 =
-                        archivo.DatosNumericos[
-                            archivo.Columnas[j].Nombre]
-                        .ToArray();
+                    // recorrer las filas originales
+                    for (int fila = 1; fila < archivo.Datos.Count; fila++)
+                    {
+                        string valor1 = archivo.Datos[fila][i];
+                        string valor2 = archivo.Datos[fila][j];
 
 
-                    double correlacion =
-                        Correlation.Pearson(datos1, datos2);
+                        // solamente tomar filas donde ambos valores existan
+                        if (string.IsNullOrWhiteSpace(valor1) ||
+                            string.IsNullOrWhiteSpace(valor2))
+                        {
+                            continue;
+                        }
+
+
+                        if (double.TryParse(valor1, out double numero1) &&
+                            double.TryParse(valor2, out double numero2))
+                        {
+                            valores1.Add(numero1);
+                            valores2.Add(numero2);
+                        }
+                    }
+
+
+                    // Pearson necesita mínimo 2 pares de datos
+                    if (valores1.Count < 2)
+                        continue;
+
+
+                    double correlacion = Correlation.Pearson(
+                        valores1.ToArray(),
+                        valores2.ToArray()
+                    );
 
 
                     archivo.Correlaciones.Add(new Correlacion
                     {
-                        Columna1 = archivo.Columnas[i].Nombre,
+                        Columna1 = columna1,
 
-                        Columna2 = archivo.Columnas[j].Nombre,
+                        Columna2 = columna2,
 
                         Coeficiente = correlacion,
 
@@ -111,7 +134,6 @@ namespace ProyectoSistemaInteligente.Services
             }
         }
 
-
         //detecta valores atípicos utilizando el método IQR
         private void CalcularValoresAtipicos(DatosArchivo archivo)
         {
@@ -120,9 +142,10 @@ namespace ProyectoSistemaInteligente.Services
 
             foreach (var columna in archivo.Columnas)
             {
-                if (!columna.EsNumerica)
-                    continue;
+                string nombre = columna.Nombre;
 
+                if (!archivo.DatosNumericos.ContainsKey(nombre))
+                    continue;
 
                 List<double> valores =
                     archivo.DatosNumericos[columna.Nombre];
@@ -230,5 +253,21 @@ namespace ProyectoSistemaInteligente.Services
             return "Muy débil";
         }
 
+        // Ejecuta K-Means y genera un resumen automático de los grupos.
+        private void CalcularClustering(DatosArchivo archivo)
+        {
+
+            archivo.Clusters.Clear();
+
+            archivo.ResumenClusters.Clear();
+
+            ClusteringService clustering = new();
+
+            archivo.Clusters = clustering.Ejecutar(archivo, 3);
+
+            ResumenClusterService resumen = new();
+
+            archivo.ResumenClusters = resumen.Generar(archivo.Clusters,archivo);
+        }
     }
 }

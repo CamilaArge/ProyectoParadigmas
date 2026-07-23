@@ -8,7 +8,7 @@ namespace ProyectoSistemaInteligente.Services
     public class DetectorDatosService
     {
 
-        //analisa las columnas
+        //analiza las columnas
         public List<Columna> Detectar(List<List<string>> datos)
         {
             List<Columna> columnas = new();
@@ -35,7 +35,7 @@ namespace ProyectoSistemaInteligente.Services
                     Nombre = nombres[i],
                     TipoDato = tipo,
                     ValoresNulos = valores
-                        .Count(x => string.IsNullOrWhiteSpace(x)),
+                        .Count(x => EsValorVacio(x)),
                         EsNumerica = tipo == "Número"
                 });
 
@@ -44,54 +44,86 @@ namespace ProyectoSistemaInteligente.Services
             return columnas;
         }
 
-
-
-        
         // determina el tipo de una lista de valores.
         private string ObtenerTipo(List<string> valores)
         {
             int numeros = 0;
-
             int booleanos = 0;
-
             int fechas = 0;
+
+            int cantidadValidos = 0;
+
 
             foreach (string valor in valores)
             {
+                if (EsValorVacio(valor))
+                    continue;
+
+                cantidadValidos++;
 
                 if (double.TryParse(valor, out _))
                 {
                     numeros++;
                 }
 
-                if (bool.TryParse(valor, out _))
+                else if (bool.TryParse(valor, out _))
                 {
                     booleanos++;
                 }
 
-                if (DateTime.TryParse(valor, out _))
+                else if (DateTime.TryParse(valor, out _))
                 {
                     fechas++;
                 }
-
             }
 
-            if (numeros == valores.Count)
+
+            if (cantidadValidos == 0)
+            {
+                return "Desconocido";
+            }
+
+
+            if (numeros == cantidadValidos)
             {
                 return "Número";
             }
 
-            if (booleanos == valores.Count)
+
+            if (booleanos == cantidadValidos)
             {
                 return "Booleano";
             }
 
-            if (fechas == valores.Count)
+
+            if (fechas == cantidadValidos)
             {
                 return "Fecha";
             }
 
+
             return "Texto";
+        }
+
+        private bool EsValorVacio(string valor)
+        {
+            if (string.IsNullOrWhiteSpace(valor))
+                return true;
+
+
+            string valorNormalizado = valor.Trim().ToUpper();
+
+
+            string[] valoresVacios =
+            {
+                "NA",
+                "N/A",
+                "NULL",
+                "NONE",
+                "-"
+            };
+
+            return valoresVacios.Contains(valorNormalizado);
         }
     }
 }

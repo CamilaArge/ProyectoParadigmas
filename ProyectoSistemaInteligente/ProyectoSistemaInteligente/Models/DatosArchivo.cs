@@ -5,7 +5,7 @@
     /// </summary>
     public class DatosArchivo
     {
-        public string NombreArchivo { get; set; }
+        public string NombreArchivo { get; set; } = "";
 
         //cada lista representa una fila
         public List<List<string>> Datos { get; set; }
@@ -14,14 +14,18 @@
         public List<Correlacion> Correlaciones { get; set; }
         public Dictionary<string, List<double>> DatosNumericos { get; set; }
         public List<ValorAtipico> ValoresAtipicos { get; set; }
+        public List<Cluster> Clusters { get; set; }
+        public List<ResumenCluster> ResumenClusters { get; set; }
 
         public DatosArchivo() { 
-        Datos = new();
-        Columnas = new();
-        Estadisticas = new();
-        Correlaciones = new();
-        DatosNumericos = new();
-        ValoresAtipicos = new();
+            Datos = new();
+            Columnas = new();
+            Estadisticas = new();
+            Correlaciones = new();
+            DatosNumericos = new();
+            ValoresAtipicos = new();
+            Clusters = new();
+            ResumenClusters = new();
 
         }
     }

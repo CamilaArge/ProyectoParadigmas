@@ -34,10 +34,13 @@ namespace ProyectoSistemaInteligente.Controllers
             var resultado = archivoService.GuardarArchivo(archivo);
 
             LectorArchivoService lector = new LectorArchivoService();
-
             var datos = lector.Leer(resultado.Ruta);
+            LimpiezaDatosService limpieza = new LimpiezaDatosService();
+            datos = limpieza.Limpiar(datos);
+            datos.DatosNumericos = ConversorDatos.Convertir(datos);
+            AnalisisService analisis = new AnalisisService();
+            analisis.Analizar(datos);
             SessionHelper.GuardarObjeto(HttpContext.Session, "Analisis", datos);
-
             return View("ResultadoArchivo", datos);
         }
     }

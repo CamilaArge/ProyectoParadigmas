@@ -13,18 +13,42 @@ namespace ProyectoSistemaInteligente.Helpers
 
             for (int i = 0; i < archivo.Columnas.Count; i++)
             {
-                if (!archivo.Columnas[i].EsNumerica)
-                    continue;
 
-                List<double> valores = archivo.Datos
-                    .Skip(1)
-                    .Select(f => Convert.ToDouble(f[i]))
-                    .ToList();
+                List<double> valores = new();
 
-                resultado.Add(archivo.Columnas[i].Nombre, valores);
+                foreach (var fila in archivo.Datos.Skip(1))
+                {
+                    var valor = fila[i];
+
+                    if (string.IsNullOrWhiteSpace(valor))
+                        continue;
+
+                    if (!EsValorVacio(valor) && double.TryParse(valor, out double num))
+                    {
+                        valores.Add(num);
+                    }
+                }
+
+                if (valores.Count > 0)
+                {
+                    resultado.Add(archivo.Columnas[i].Nombre, valores);
+                }
             }
-
             return resultado;
+        }
+
+        private static bool EsValorVacio(string valor)
+        {
+            if (string.IsNullOrWhiteSpace(valor))
+                return true;
+
+            string valorNormalizado = valor.Trim().ToUpper();
+
+            return valorNormalizado == "NA" ||
+                   valorNormalizado == "N/A" ||
+                   valorNormalizado == "NULL" ||
+                   valorNormalizado == "NONE" ||
+                   valorNormalizado == "-";
         }
     }
 }

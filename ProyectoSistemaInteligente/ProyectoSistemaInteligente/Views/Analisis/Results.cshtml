@@ -1,96 +1,148 @@
 ﻿@model ProyectoSistemaInteligente.Models.DatosArchivo
 
-    @{
-        ViewData["Title"] = "Resultados";
+@{
+    ViewData["Title"] = "Resultados";
+}
+
+<h2>Resultados del análisis</h2>
+
+<hr/>
+
+<h4>Estadísticas descriptivas</h4>
+
+<table class="table table-bordered table-striped">
+
+    <thead>
+
+        <tr>
+
+            <th>
+                Columna
+            </th>
+
+            <th>
+                Cantidad
+            </th>
+
+            <th>
+                Promedio
+            </th>
+
+            <th>
+                Mediana
+            </th>
+
+            <th>
+                Mínimo
+            </th>
+
+            <th>
+                Máximo
+            </th>
+
+            <th>
+                Desviación estándar
+            </th>
+
+        </tr>
+    </thead>
+<tbody>
+
+    @foreach (var item in Model.Estadisticas)
+    {
+        <tr>
+
+            <td>
+                @item.NombreColumna
+            </td>
+
+            <td>
+                @item.Cantidad
+            </td>
+
+            <td>
+                @item.Promedio.ToString("0.00")
+            </td>
+
+            <td>
+                @item.Mediana.ToString("0.00")
+            </td>
+
+            <td>
+                @item.Minimo.ToString("0.00")
+            </td>
+
+            <td>
+                @item.Maximo.ToString("0.00")
+            </td>
+
+            <td>
+                @item.DesviacionEstandar.ToString("0.00")
+            </td>
+
+        </tr>
     }
+    </tbody>
+</table>
 
+<hr />
 
-    <h2>Resultados del análisis</h2>
+<h4>Gráficos por variable</h4>
 
-    <hr />
+<div id="graficosColumnas" class="d-flex flex-wrap gap-4"></div>
 
+<hr />
 
-    <h4>Estadísticas descriptivas</h4>
+<h4>Correlaciones encontradas</h4>
 
-        <table class="table table-bordered table-striped">
+@if (Model.Correlaciones.Count == 0)
+{
+    <div class="alert alert-warning">
+        No hay suficientes datos para calcular correlaciones.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
 
-            <thead>
+        <thead>
+            <tr>
+                <th>Variable 1</th>
+                <th>Variable 2</th>
+                <th>Coeficiente</th>
+                <th>Interpretación</th>
+            </tr>
+        </thead>
 
-                <tr>
-
-                    <th>
-                        Columna
-                    </th>
-
-                    <th>
-                        Cantidad
-                    </th>
-
-                    <th>
-                        Promedio
-                    </th>
-
-                    <th>
-                        Mediana
-                    </th>
-
-                    <th>
-                        Mínimo
-                    </th>
-
-                    <th>
-                        Máximo
-                    </th>
-
-                    <th>
-                        Desviación estándar
-                    </th>
-
-                </tr>
-            </thead>
         <tbody>
-
-            @foreach (var item in Model.Estadisticas)
+            @foreach (var item in Model.Correlaciones)
             {
                 <tr>
-
-                    <td>
-                        @item.NombreColumna
-                    </td>
-
-                    <td>
-                        @item.Cantidad
-                    </td>
-
-                    <td>
-                        @item.Promedio.ToString("0.00")
-                    </td>
-
-                    <td>
-                        @item.Mediana.ToString("0.00")
-                    </td>
-
-                    <td>
-                        @item.Minimo.ToString("0.00")
-                    </td>
-
-                    <td>
-                        @item.Maximo.ToString("0.00")
-                    </td>
-
-                    <td>
-                        @item.DesviacionEstandar.ToString("0.00")
-                    </td>
-
+                    <td>@item.Columna1</td>
+                    <td>@item.Columna2</td>
+                    <td>@item.Coeficiente.ToString("0.000")</td>
+                    <td>@item.Interpretacion</td>
                 </tr>
             }
         </tbody>
+
     </table>
-    <hr />
+}
+   
+<hr />
 
+<h4>Valores atípicos detectados</h4>
 
-    <h4>Correlaciones encontradas</h4>
+@if (Model.ValoresAtipicos.Count == 0)
+{
+    <div class="alert alert-success">
 
+        No se encontraron valores atípicos.
+
+    </div>
+}
+else
+{
 
     <table class="table table-bordered table-striped">
 
@@ -99,43 +151,41 @@
             <tr>
 
                 <th>
-                    Variable 1
+                    Columna
                 </th>
 
                 <th>
-                    Variable 2
+                    Fila
                 </th>
 
                 <th>
-                    Coeficiente
+                    Valor
                 </th>
 
                 <th>
-                    Interpretación
+                    Método
                 </th>
 
             </tr>
         </thead>
-     <tbody>
-
-            @foreach (var item in Model.Correlaciones)
+        <tbody>
+            @foreach (var item in Model.ValoresAtipicos)
             {
                 <tr>
-
                     <td>
-                        @item.Columna1
+                        @item.Columna
                     </td>
 
                     <td>
-                        @item.Columna2
+                        @item.Fila
                     </td>
 
                     <td>
-                        @item.Coeficiente.ToString("0.000")
+                        @item.Valor
                     </td>
 
                     <td>
-                        @item.Interpretacion
+                        @item.Metodo
                     </td>
 
                 </tr>
@@ -143,73 +193,194 @@
 
         </tbody>
     </table>
+}
 
+<hr/>
 
-    <hr />
+<h4>Resumen de agrupamientos (K-Means)</h4>
 
-
-    <h4>Valores atípicos detectados</h4>
-
-
-    @if (Model.ValoresAtipicos.Count == 0)
+@if (Model.ResumenClusters.Count == 0)
+{
+    <div class="alert alert-warning">
+        No se encontraron agrupamientos.
+    </div>
+}
+else
+{
+    @foreach (var grupo in Model.ResumenClusters.OrderBy(x => x.Grupo))
     {
-        <div class="alert alert-success">
+        <div class="card mb-3">
 
-            No se encontraron valores atípicos.
+            <div class="card-body">
+
+                <div class="alert alert-info">
+
+                    <h4>
+                        Grupo @grupo.Grupo
+                    </h4>
+
+                    <p>
+                        @grupo.Interpretacion
+                    </p>
+
+                </div>
+
+                <p>
+                    Variables principales del grupo:
+                </p>
+
+                <ul>
+                    @foreach (var variable in grupo.VariablesDiferenciadoras)
+                    {
+                        <li>
+                            @variable
+                        </li>
+                    }
+                </ul>
+
+                <p>
+                    Registros pertenecientes:
+                </p>
+
+
+                <ul>
+
+                    @foreach (var elemento in grupo.Clientes)
+                    {
+                        <li>
+                            @elemento
+                        </li>
+                    }
+
+                </ul>
+
+
+            </div>
 
         </div>
     }
+}
+<!--Creación de los gráficos circulares. -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const filas = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Datos));
+    const columnas = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Columnas));
+
+    const contenedor = document.getElementById("graficosColumnas");
+
+    if (!filas || filas.length <= 1)
+    {
+        contenedor.innerHTML = "<div class='alert alert-warning'>No hay datos</div>";
+
+    }
     else
     {
+        const encabezados = filas[0];
+        const datos = filas.slice(1);
 
-        <table class="table table-bordered table-striped">
+        const indexNombre = 0;
 
-            <thead>
+        encabezados.forEach((columna, colIndex) =>
+        {
+            if (colIndex === indexNombre)
+                return;
+            let grupos = {};
 
-                <tr>
+            datos.forEach(fila =>
+            {
+                let nombre = fila[indexNombre]?.trim();
 
-                    <th>
-                        Columna
-                    </th>
+                let valor = fila[colIndex]?.trim();
 
-                    <th>
-                        Fila
-                    </th>
-
-                    <th>
-                        Valor
-                    </th>
-
-                    <th>
-                        Método
-                    </th>
-
-                </tr>
-            </thead>
-          <tbody>
-
-                @foreach (var item in Model.ValoresAtipicos)
+                if (!nombre)
                 {
-                    <tr>
-                        <td>
-                            @item.Columna
-                        </td>
-
-                        <td>
-                            @item.Fila
-                        </td>
-
-                        <td>
-                            @item.Valor
-                        </td>
-
-                        <td>
-                            @item.Metodo
-                        </td>
-
-                    </tr>
+                    nombre = "Sin nombre";
                 }
 
-            </tbody>
-        </table>
+                if (!valor || valor === "" || valor === "NA" || valor === " ")
+                {
+                    valor = "Sin dato";
+                }
+
+                if (!isNaN(valor) && valor !== "Sin dato")
+                {
+                    valor = Number(valor);
+                }
+
+                if (!grupos[valor])
+                {
+                    grupos[valor] = [];
+                }
+
+                grupos[valor].push(nombre);
+            });
+
+            const labels = Object.keys(grupos);
+
+            const data = labels.map(valor => grupos[valor].length );
+
+
+            const detalle = labels.map(valor => grupos[valor].join(", "));
+
+            const contenedorGrafico = document.createElement("div");
+
+            contenedorGrafico.style.width = "400px";
+            contenedorGrafico.style.height = "400px";
+            contenedorGrafico.style.marginBottom = "40px";
+
+            const canvas = document.createElement("canvas");
+
+            contenedorGrafico.appendChild(canvas);
+
+            contenedor.appendChild(contenedorGrafico);
+
+            new Chart(canvas,
+            {
+                type: 'pie',
+
+                data:
+                {
+                    labels: labels,
+
+                    datasets:
+                    [
+                        {
+                            label: columna,
+                            data: data,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options:
+                {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins:
+                    {
+                        title:
+                        {
+                            display: true,
+
+                            text: "Distribución de " + columna
+                        },
+                        tooltip:
+                        {
+                            callbacks:
+                            {
+                                label: function(context)
+                                {
+                                    let i = context.dataIndex;
+
+                                    return context.label + " (" + context.raw + " registros): " + detalle[i];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
     }
+</script>

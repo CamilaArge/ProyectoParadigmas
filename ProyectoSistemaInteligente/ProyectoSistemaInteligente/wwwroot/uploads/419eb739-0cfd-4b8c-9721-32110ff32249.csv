@@ -1,0 +1,11 @@
+﻿Cliente,Edad,Ingreso,Compras,Calificacion
+Juan,20,1000,5,8
+Maria,25,1500,7,9
+Pedro,30,2000,8,7
+Ana,35,2500,10,10
+Luis,40,3000,12,8
+Carlos,,3500,15,9
+Marta,50,,18,7
+Sofia,55,10000,20,10
+Diego,45,4000,,8
+Laura,NA,4500,25,9
